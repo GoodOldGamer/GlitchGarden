@@ -1,15 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MusicManager : MonoBehaviour 
 {
 	public AudioClip[] levelMusicChangeArray;
 	
 	private AudioSource music;
+    private static MusicManager instance;
 	
 	void Awake()
 	{
-		DontDestroyOnLoad( gameObject );
+        if ( instance ) {
+            Destroy( gameObject );
+        }
+        else {
+            instance = this;
+        }
+
+        DontDestroyOnLoad( gameObject );
 	}
 	
 	void Start()
@@ -18,16 +27,16 @@ public class MusicManager : MonoBehaviour
 		music.loop = true;
 		
 		UpdateVolumeSettings();		
-		OnLevelWasLoaded( 0 );
+        OnLevelWasLoaded( SceneManager.GetActiveScene().buildIndex );
 	}
-	
+
 	void OnLevelWasLoaded( int level )
 	{
-		Debug.Log( "Music Player loaded level " + level.ToString() );
+		//Debug.Log( "Music Player loaded level " + level.ToString() );
 		
-		AudioClip thisLevelMusic = levelMusicChangeArray[ level ];
+        AudioClip thisLevelMusic = instance.levelMusicChangeArray[ level ];
 		
-		if ( thisLevelMusic && thisLevelMusic != music.clip ) {
+        if ( thisLevelMusic && music && thisLevelMusic != music.clip ) {
 			music.Stop();
 			music.clip = thisLevelMusic;	
 			music.Play();
