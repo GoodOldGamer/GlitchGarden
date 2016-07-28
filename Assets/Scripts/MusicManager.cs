@@ -26,22 +26,24 @@ public class MusicManager : MonoBehaviour
 		music = GetComponent<AudioSource>();
 		music.loop = true;
 		
-		UpdateVolumeSettings();		
-        OnLevelWasLoaded( SceneManager.GetActiveScene().buildIndex );
-	}
+		UpdateVolumeSettings();
 
-	void OnLevelWasLoaded( int level )
-	{
-		//Debug.Log( "Music Player loaded level " + level.ToString() );
-		
-        AudioClip thisLevelMusic = instance.levelMusicChangeArray[ level ];
-		
-        if ( thisLevelMusic && music && thisLevelMusic != music.clip ) {
-			music.Stop();
-			music.clip = thisLevelMusic;	
-			music.Play();
-		}
+        SceneManager.sceneLoaded += LevelLoaded;
+        LevelLoaded( SceneManager.GetActiveScene(), LoadSceneMode.Single );
 	}
+   
+    void LevelLoaded(Scene scene, LoadSceneMode mode)
+    {
+        //Debug.Log( "Music Player loaded level " + level.ToString() );
+        
+        AudioClip thisLevelMusic = instance.levelMusicChangeArray[ scene.buildIndex ];
+        
+        if ( thisLevelMusic && music && thisLevelMusic != music.clip ) {
+            music.Stop();
+            music.clip = thisLevelMusic;    
+            music.Play();
+        }
+    }
 	
 	public void UpdateVolumeSettings()
 	{
